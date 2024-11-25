@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        button, input, select {
+            margin: 10px 0;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        .container {
+            display: none;
+            text-align: center;
+            margin: 0 auto;
+            max-width: 800px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #landingPage {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .pagination button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .pagination button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Add Expense Form */
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin: 20px auto;
+        }
+
+        form label {
+            text-align: left;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        form input {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        /* Message */
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: none;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Expense Tracker</h1>
+
+    <!-- Landing Page -->
+    <div id="landingPage">
+        <button onclick="showPage('addExpense')">Add Expense</button>
+        <button onclick="showPage('viewSummary')">View Summary</button>
+        <button onclick="showPage('searchExpense')">Search Expense</button>
+        <button onclick="showPage('deleteExpense')">Delete Expense</button>
+        <button onclick="showPage('downloadData')">Download Data</button>
+    </div>
+
+    <!-- Add Expense Page -->
+    <div id="addExpense" class="container">
+        <h2>Add Expense</h2>
+        <form id="expenseForm">
+            <label for="description">Description:</label>
+            <input type="text" id="description" required>
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" required>
+            <label for="date">Date:</label>
+            <input type="date" id="date" required>
+            <button type="submit">Add Expense</button>
+        </form>
+        <div id="addMessage" class="message">Expense added successfully!</div>
+        <button onclick="showPage('landingPage')">Back to Home</button>
+    </div>
+
+    <!-- Summary Page -->
+    <div id="viewSummary" class="container">
+        <h2>Summary</h2>
+        <table id="summaryTable">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="summaryBody"></tbody>
+        </table>
+        <div class="pagination" id="pagination"></div>
+        <button onclick="showPage('landingPage')">Back to Home</button>
+    </div>
+
+    <!-- Search Page -->
+    <div id="searchExpense" class="container">
+        <h2>Search Expense</h2>
+        <input type="text" id="searchInput" placeholder="Enter description or date (dd-mm-yyyy)">
+        <button onclick="searchExpenses()">Search</button>
+        <div id="searchMessage" class="message">Search complete!</div>
+        <table id="searchTable">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="searchBody"></tbody>
+        </table>
+        <button onclick="showPage('landingPage')">Back to Home</button>
+    </div>
+
+    <!-- Delete Page -->
+    <div id="deleteExpense" class="container">
+        <h2>Delete Expense</h2>
+        <label for="deleteDate">Select Date:</label>
+        <input type="date" id="deleteDate" onchange="filterExpensesByDate()">
+        <table id="deleteTable">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="deleteBody"></tbody>
+        </table>
+        <button onclick="deleteSelectedExpenses()">Delete Selected</button>
+        <div id="deleteMessage" class="message">Expenses deleted successfully!</div>
+        <button onclick="showPage('landingPage')">Back to Home</button>
+    </div>
+
+    <!-- Download Data Page -->
+    <div id="downloadData" class="container">
+        <h2>Download Data</h2>
+        <label for="fromDate">From:</label>
+        <input type="date" id="fromDate">
+        <label for="toDate">To:</label>
+        <input type="date" id="toDate">
+        <button onclick="downloadData()">Download as Text File</button>
+        <button onclick="showPage('landingPage')">Back to Home</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
